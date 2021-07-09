@@ -6,5 +6,8 @@
   "repository": "git@github.com:yuri-g/bookmark-dial.git",
   "author": "yuri <me@yurirenko.com>",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "web-ext": "^6.2.0"
+  }
 }

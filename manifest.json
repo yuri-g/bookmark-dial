@@ -6,5 +6,8 @@
   "description": "Shows your bookmarks on the new tab",
   "chrome_url_overrides": {
     "newtab": "index.html"
-  }
+  },
+  "permissions": [
+    "bookmarks"
+  ]
 }
