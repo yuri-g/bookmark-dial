@@ -1,0 +1,10 @@
+{
+  "name": "bookmark-dial",
+  "version": "0.0.1",
+  "description": "Shows your bookmarks on the new tab",
+  "main": "index.js",
+  "repository": "git@github.com:yuri-g/bookmark-dial.git",
+  "author": "yuri <me@yurirenko.com>",
+  "license": "MIT",
+  "private": true
+}
