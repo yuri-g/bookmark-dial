@@ -8,6 +8,12 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "esbuild": "^0.12.17",
+    "typescript": "^4.3.5",
     "web-ext": "^6.2.0"
+  },
+  "scripts": {
+    "watch": "esbuild ./main.ts --bundle --outfile=./main.js --watch && web-ext run",
+    "tsWatch": "tsc --watch"
   }
 }

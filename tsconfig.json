@@ -1,0 +1,10 @@
+{
+  "exclude": ["node_modules"],
+  "include": "main.ts",
+  "compilerOptions": {
+    "noEmit": true,
+    "lib": ["esnext", "dom"],
+    "strict": true,
+    "target": "ES2015"
+  }
+}

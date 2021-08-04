@@ -8,6 +8,7 @@
     "newtab": "index.html"
   },
   "permissions": [
-    "bookmarks"
+    "bookmarks",
+    "storage"
   ]
 }
