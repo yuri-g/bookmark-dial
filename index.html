@@ -2,21 +2,53 @@
 <html lang="en">
   <head>
     <title>New Tab</title>
+    <meta charset="utf-8">
     <script defer src="./main.js"></script>
     <style type="text/css">
-      a.bookmark-folder, a.bookmark-item {
-        display: block;
-        color: blue;
-        text-decoration: underline;
-        margin: 20px 0;
-      }
       a.bookmark-folder:hover, a.bookmark-item:hover {
         cursor: pointer;
+      }
+      #bookmarks-container {
+        display: flex;
+        flex-basis: 200px;
+        flex-wrap: wrap;
+        width: 1200px;
+        justify-content: left;
+      }
+      .bookmark-folder, .bookmark-item {
+        align-items: center;
+        text-decoration: none;
+        color: #0060a0;
+        display: flex;
+        flex-direction: column;
+        width: 100px;
+        max-height: 120px;
+      }
+      .bookmark-folder:hover, .bookmark-item:hover {
+        cursor: pointer;
+      }
+      .bookmark-folder > .icon {
+        background-image: url('./folder_icon.svg');
+        background-repeat:no-repeat;
+        background-position: center center;
+      }
+      .bookmark-folder > .text, .bookmark-item > .text {
+        font-family: Helvetica Neue, Arial, sans-serif;
+        font-size: 12px;
+        font-weight: 300;
+        max-height: 20px;
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .icon {
+        min-height: 60px;
+        min-width: 60px;
       }
     </style>
   </head>
   <body>
-    <h3>Hello, sailor</h3>
     <div id="bookmarks-container">
     </div>
   </body>

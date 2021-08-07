@@ -5,95 +5,134 @@
 * 2) improve styles
 * 3) clean-up this file
 */
-
-async function fetchBookmarks() {
-  return browser.bookmarks.getTree();
-}
+type BookmarkTreeNode = browser.bookmarks.BookmarkTreeNode;
 
 const bookmarksContainer = document.getElementById('bookmarks-container');
-
-function handleFolderClick(bookmark, parent = null) {
-  return async () => {
-    const children = await browser.bookmarks.getChildren(bookmark.id);
-
-    renderBookmarks(children, parent);
-
-    browser.storage.local.set({
-      lastFolderId: bookmark.id
-    });
-  };
+if (bookmarksContainer === null) {
+  throw new Error('Bookmarks container element is missing!');
 }
 
-function renderBookmarks(bookmarks, parent = null) {
-  // @todo fetch children here?
-  while (bookmarksContainer.firstChild) {
-    bookmarksContainer.removeChild(bookmarksContainer.firstChild);
+(async (container: HTMLElement) => {
+  async function fetchBookmarks(): Promise<BookmarkTreeNode[]> {
+    return browser.bookmarks.getTree();
   }
 
-  if (parent !== null) {
+  function handleFolderClick(bookmark: BookmarkTreeNode, parent: BookmarkTreeNode | null = null) {
+    return async () => {
+      const children = await browser.bookmarks.getChildren(bookmark.id);
+
+      renderBookmarks(bookmark, children, parent);
+
+      browser.storage.local.set({
+        lastFolderId: bookmark.id
+      });
+    };
+  }
+
+  async function getParent(node: BookmarkTreeNode): Promise<BookmarkTreeNode | null> {
+    if (typeof node.parentId === 'undefined') {
+      return null;
+    }
+
+    const [parent] = await browser.bookmarks.get(node.parentId);
+
+    return parent;
+  }
+
+  /**
+  * @todo Pass only currentFolder??
+  */
+  function renderBookmarks(
+    currentFolder: BookmarkTreeNode,
+    bookmarks: BookmarkTreeNode[],
+    parent: BookmarkTreeNode | null = null
+  ) {
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
+
+    if (parent !== null) {
       const folder = document.createElement('a');
 
       folder.setAttribute('class', 'bookmark-folder');
-      folder.textContent = '..';
+      const icon = document.createElement('div');
+      const text = document.createElement('div');
+      icon.classList.add('icon');
+      text.classList.add('text');
+
+      text.textContent = '..';
+      folder.append(icon, text);
+
       folder.addEventListener('click', async () => {
         const parentChildren = await browser.bookmarks.getChildren(parent.id);
 
         browser.storage.local.set({
           lastFolderId: parent.id
         });
-        renderBookmarks(parentChildren, parent);
+        const parentOfParent = await getParent(parent);
+
+        renderBookmarks(parent, parentChildren, parentOfParent);
       });
-      bookmarksContainer.appendChild(folder);
-  }
-
-  for (bookmark of bookmarks) {
-    if (bookmark.type === 'folder') {
-      (() => {
-        const folder = document.createElement('a');
-
-        folder.id = bookmark.id;
-        folder.classList.add('bookmark-folder');
-        folder.setAttribute('data-id', bookmark.id);
-        folder.textContent = bookmark.title;
-        bookmarksContainer.appendChild(folder);
-
-        folder.addEventListener('click', handleFolderClick(bookmark, parent));
-      })();
-    } else {
-      const el = document.createElement('a');
-
-      el.classList.add('bookmark-item');
-      el.textContent = bookmark.title;
-      el.setAttribute('href', bookmark.url);
-
-      bookmarksContainer.appendChild(el);
+      container.appendChild(folder);
     }
-  }
-}
 
-(async () => {
-  browser.storage.local.get('lastFolderId').then(async (result) => {
-    if (typeof result.lastFolderId === 'undefined') {
-      const [root] = await fetchBookmarks();
-      if (typeof root === 'undefined') {
-        return;
-      }
+    for (let bookmark of bookmarks) {
+      if (bookmark.type === 'folder') {
+        (() => {
+          const folder = document.createElement('div');
+          const icon = document.createElement('div');
+          const text = document.createElement('div');
 
-      renderBookmarks(root.children, root);
-    } else {
-      const bookmarkFolder = await browser.bookmarks.get(result.lastFolderId);
+          icon.classList.add('icon');
+          text.classList.add('text');
 
-      if (bookmarkFolder.length > 0) {
-        const children = await browser.bookmarks.getChildren(bookmarkFolder[0].id);
-        if (bookmarkFolder[0].parentId) {
-          const parent = await browser.bookmarks.get(bookmarkFolder[0].parentId);
-          renderBookmarks(children, parent[0]);
-        } else {
-          renderBookmarks(children);
-        }
+          folder.id = bookmark.id;
+          folder.classList.add('bookmark-folder');
+          text.textContent = bookmark.title;
+          folder.append(icon, text);
+
+          container.appendChild(folder);
+
+          folder.addEventListener('click', handleFolderClick(bookmark, currentFolder));
+        })();
+      } else {
+        const el = document.createElement('div');
+
+        const icon = document.createElement('div');
+        const text = document.createElement('div');
+
+        el.classList.add('bookmark-item');
+        icon.classList.add('icon');
+        text.classList.add('text');
+        el.append(icon, text);
+
+        text.textContent = bookmark.title;
+
+        container.appendChild(el);
       }
     }
-  });
+  }
 
-  return;
-})();
+  const storedData = await browser.storage.local.get('lastFolderId');
+
+  if (typeof storedData.lastFolderId === 'undefined') {
+    const [root] = await fetchBookmarks();
+    if (typeof root === 'undefined' || typeof root.children === 'undefined') {
+      return;
+    }
+
+    renderBookmarks(root, root.children);
+  } else {
+    const bookmarkFolder = await browser.bookmarks.get(storedData.lastFolderId);
+
+    if (bookmarkFolder.length > 0) {
+      const children = await browser.bookmarks.getChildren(bookmarkFolder[0].id);
+      if (bookmarkFolder[0].parentId) {
+        const parent = await browser.bookmarks.get(bookmarkFolder[0].parentId);
+        renderBookmarks(bookmarkFolder[0], children, parent[0]);
+      } else {
+        renderBookmarks(bookmarkFolder[0], children);
+      }
+    }
+  }
+})(bookmarksContainer);
