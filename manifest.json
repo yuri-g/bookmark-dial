@@ -2,7 +2,6 @@
   "manifest_version": 2,
   "name": "Bookmark",
   "version": "0.0.1",
-
   "description": "Shows your bookmarks on the new tab",
   "chrome_url_overrides": {
     "newtab": "index.html"

@@ -1,4 +1,11 @@
-main.js
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+build/*.js
 node_modules/
 web-ext-artifacts/
 .DS_Store
