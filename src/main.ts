@@ -1,9 +1,7 @@
 /*
 * @todo:
-* 1) add icons
-* 2) Improve performance: avoid too many renders, reduce amount of GC calls, avoid doing too much stuff in the loop
-* 2) improve styles
-* 3) clean-up this file
+* 1) Improve performance: avoid too many renders, reduce amount of GC calls, avoid doing too much stuff in the loop
+* 2) clean-up this file
 */
 type BookmarkTreeNode = browser.bookmarks.BookmarkTreeNode;
 
