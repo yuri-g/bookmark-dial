@@ -5,12 +5,45 @@
 */
 type BookmarkTreeNode = browser.bookmarks.BookmarkTreeNode;
 
+const itemClasses = [
+  'max-w-sm',
+  'flex-none',
+  'w-16',
+  'h-28',
+  'max-h-28',
+];
+const iconClasses = [
+  'icon',
+  'h-16',
+  'max-h-16',
+  'w-16',
+  'shadow-md',
+  'bg-white',
+  'rounded-lg',
+];
+const textClasses = [
+  'text',
+  'box-border',
+  'break-words',
+  'text-center',
+  'inline-block',
+  'mt-2',
+  'h-10',
+  'p-1.5',
+  'max-h-12',
+  'text-xs',
+  'w-16',
+  'line-clamp-2',
+  'overflow-hidden'
+];
+
 const bookmarksContainer = document.getElementById('bookmarks-container');
-if (bookmarksContainer === null) {
+const folderNameContainer = document.getElementById('folder-name');
+if (bookmarksContainer === null || folderNameContainer === null) {
   throw new Error('Bookmarks container element is missing!');
 }
 
-(async (container: HTMLElement) => {
+(async (container: HTMLElement, folderNameContainer: HTMLElement) => {
   async function fetchBookmarks(): Promise<BookmarkTreeNode[]> {
     return browser.bookmarks.getTree();
   }
@@ -52,13 +85,13 @@ if (bookmarksContainer === null) {
     if (parent !== null) {
       const folder = document.createElement('a');
 
-      folder.setAttribute('class', 'bookmark-folder');
+      folder.setAttribute('class', 'bookmark-folder flex-none');
       const icon = document.createElement('div');
       const text = document.createElement('div');
       icon.classList.add('icon');
       text.classList.add('text');
 
-      text.textContent = '..';
+      text.textContent = currentFolder.title;
       folder.append(icon, text);
 
       folder.addEventListener('click', async () => {
@@ -71,7 +104,8 @@ if (bookmarksContainer === null) {
 
         renderBookmarks(parent, parentChildren, parentOfParent);
       });
-      container.appendChild(folder);
+
+      folderNameContainer.appendChild(folder);
     }
 
     for (let bookmark of bookmarks) {
@@ -81,11 +115,11 @@ if (bookmarksContainer === null) {
           const icon = document.createElement('div');
           const text = document.createElement('div');
 
-          icon.classList.add('icon');
-          text.classList.add('text');
+          icon.classList.add(...iconClasses);
+          text.classList.add(...textClasses);
 
           folder.id = bookmark.id;
-          folder.classList.add('bookmark-folder');
+          folder.classList.add('bookmark-folder', ...itemClasses);
           text.textContent = bookmark.title;
           folder.append(icon, text);
 
@@ -100,9 +134,10 @@ if (bookmarksContainer === null) {
           const icon = document.createElement('div');
           const text = document.createElement('a');
 
-          el.classList.add('bookmark-item');
-          icon.classList.add('icon');
-          text.classList.add('text');
+          el.classList.add('bookmark-item', ...itemClasses);
+          icon.classList.add(...iconClasses);
+          icon.textContent = bookmark.title.substring(0, 1);
+          text.classList.add(...textClasses);
           if (bookmark.url) {
             text.setAttribute('href', bookmark.url);
             text.setAttribute('target', '_blank');
@@ -139,4 +174,4 @@ if (bookmarksContainer === null) {
       }
     }
   }
-})(bookmarksContainer);
+})(bookmarksContainer, folderNameContainer);
