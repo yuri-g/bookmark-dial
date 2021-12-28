@@ -20,6 +20,9 @@ const iconClasses = [
   'shadow-md',
   'bg-white',
   'rounded-lg',
+  'grid',
+  'justify-center',
+  'content-center'
 ];
 const textClasses = [
   'text',
@@ -35,6 +38,14 @@ const textClasses = [
   'w-16',
   'line-clamp-2',
   'overflow-hidden'
+];
+
+const imageClasses = [
+  'rounded-lg',
+];
+const letterIconClases = [
+  'text-2xl',
+  'uppercase'
 ];
 
 const bookmarksContainer = document.getElementById('bookmarks-container');
@@ -128,7 +139,7 @@ if (bookmarksContainer === null || folderNameContainer === null) {
           folder.addEventListener('click', handleFolderClick(bookmark, currentFolder));
         })();
       } else {
-        (() => {
+        (async () => {
           const el = document.createElement('div');
 
           const icon = document.createElement('div');
@@ -136,9 +147,22 @@ if (bookmarksContainer === null || folderNameContainer === null) {
 
           el.classList.add('bookmark-item', ...itemClasses);
           icon.classList.add(...iconClasses);
-          icon.textContent = bookmark.title.substring(0, 1);
           text.classList.add(...textClasses);
           if (bookmark.url) {
+            const host = new URL(bookmark.url).hostname;
+            const favicon = await browser.storage.local.get(`favicon:${host}`);
+            if (typeof favicon[`favicon:${host}`] !== 'undefined') {
+              const iconImage = document.createElement('img');
+              iconImage.classList.add(...imageClasses);
+              iconImage.setAttribute('src', favicon[`favicon:${host}`]);
+              icon.appendChild(iconImage);
+            } else {
+              const textIcon = document.createElement('div');
+              textIcon.textContent = bookmark.title.substring(0, 1);
+              textIcon.classList.add(...letterIconClases);
+              icon.appendChild(textIcon);
+            }
+
             text.setAttribute('href', bookmark.url);
             text.setAttribute('target', '_blank');
           }

@@ -3,11 +3,15 @@
   "name": "Bookmark",
   "version": "0.0.1",
   "description": "Shows your bookmarks on the new tab",
+  "background": {
+    "scripts": ["./build/background.js"]
+  },
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
   "permissions": [
     "bookmarks",
-    "storage"
+    "storage",
+    "tabs"
   ]
 }
