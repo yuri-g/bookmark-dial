@@ -48,6 +48,12 @@ const letterIconClases = [
   'uppercase'
 ];
 
+const folderNameClasses = [
+  'name',
+  'w-5',
+  'h-5'
+];
+
 const bookmarksContainer = document.getElementById('bookmarks-container');
 const folderNameContainer = document.getElementById('folder-name');
 if (bookmarksContainer === null || folderNameContainer === null) {
@@ -69,6 +75,20 @@ if (bookmarksContainer === null || folderNameContainer === null) {
         lastFolderId: bookmark.id
       });
     };
+  }
+
+  function getGoBackHandler(parent: BookmarkTreeNode): () => Promise<void> {
+    return async () => {
+      const parentChildren = await browser.bookmarks.getChildren(parent.id);
+
+      browser.storage.local.set({
+        lastFolderId: parent.id
+      });
+
+      const parentOfParent = await getParent(parent);
+
+      renderBookmarks(parent, parentChildren, parentOfParent);
+    }
   }
 
   async function getParent(node: BookmarkTreeNode): Promise<BookmarkTreeNode | null> {
@@ -93,19 +113,14 @@ if (bookmarksContainer === null || folderNameContainer === null) {
       container.removeChild(container.firstChild);
     }
 
+    const folderName = document.createElement('a');
+    folderName.classList.add(...folderNameClasses);
+    folderName.innerText = currentFolder.title
+      ? currentFolder.title
+      : 'Bookmarks';
+
     if (parent !== null) {
-      const folder = document.createElement('a');
-
-      folder.setAttribute('class', 'bookmark-folder flex-none');
-      const icon = document.createElement('div');
-      const text = document.createElement('div');
-      icon.classList.add('icon');
-      text.classList.add('text');
-
-      text.textContent = currentFolder.title;
-      folder.append(icon, text);
-
-      folder.addEventListener('click', async () => {
+      folderName.addEventListener('click', async () => {
         const parentChildren = await browser.bookmarks.getChildren(parent.id);
 
         browser.storage.local.set({
@@ -115,9 +130,13 @@ if (bookmarksContainer === null || folderNameContainer === null) {
 
         renderBookmarks(parent, parentChildren, parentOfParent);
       });
-
-      folderNameContainer.appendChild(folder);
     }
+
+    const previousName = folderNameContainer.getElementsByClassName('name').item(0);
+    if (previousName) {
+      folderNameContainer.removeChild(previousName);
+    }
+    folderNameContainer.appendChild(folderName);
 
     for (let bookmark of bookmarks) {
       if (bookmark.type === 'folder') {

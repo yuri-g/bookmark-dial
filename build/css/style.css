@@ -434,6 +434,9 @@ Ensure the default browser behavior of the `hidden` attribute.
 .h-10 {
   height: 2.5rem;
 }
+.h-5 {
+  height: 1.25rem;
+}
 .max-h-28 {
   max-height: 7rem;
 }
@@ -445,6 +448,9 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 .w-16 {
   width: 4rem;
+}
+.w-5 {
+  width: 1.25rem;
 }
 .max-w-3xl {
   max-width: 48rem;
@@ -500,10 +506,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   font-size: 0.75rem;
   line-height: 1rem;
 }
-.text-xl {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-}
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
@@ -521,4 +523,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+.name:before {
+  display: inline-flex;
+  height: 1.25rem;
+  width: 1.25rem;
+  content: '';
+  background-image: url('../left.svg');
 }
